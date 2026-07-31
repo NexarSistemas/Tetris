@@ -389,6 +389,46 @@
       letter-spacing: .08em;
     }
 
+    .nexar-promo {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(87,87,184,.32);
+      display: grid;
+      gap: 5px;
+      min-height: 68px;
+    }
+
+    .nexar-promo-label {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--dim);
+      font-size: .58rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .nexar-promo-copy {
+      color: var(--text);
+      font-size: .74rem;
+      line-height: 1.35;
+    }
+
+    .nexar-promo-link {
+      justify-self: center;
+      color: var(--neon-cyan);
+      font-size: .7rem;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color .12s linear, opacity .12s linear;
+    }
+
+    .nexar-promo-link:hover,
+    .nexar-promo-link:focus-visible {
+      border-color: currentColor;
+      outline: none;
+    }
+
+    .nexar-promo-link:active { opacity: .72; }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -438,6 +478,8 @@
       .btn-dir { width: 54px; height: 54px; }
       .action-pad { grid-template-columns: 68px 68px; grid-template-rows: 68px 40px; }
       .btn-rotate, .btn-hold { width: 68px; height: 68px; }
+      .overlay-card { padding: 22px 18px; }
+      .nexar-promo { margin-top: 16px; }
     }
 
     @media (max-width: 390px) {
@@ -451,6 +493,7 @@
       .btn-rotate, .btn-hold { width: 62px; height: 62px; }
       .btn-drop { height: 38px; }
       .help { font-size: .52rem; }
+      .nexar-promo-copy { font-size: .7rem; }
     }
 
     @media (orientation: landscape) and (max-height: 560px) {
@@ -480,6 +523,11 @@
       <div class="overlay-sub" id="overlay-msg">Versión optimizada para PC y celular. Deslizá sobre el tablero o usá los botones táctiles.</div>
       <div class="overlay-score" id="overlay-score" hidden></div>
       <button class="overlay-btn" id="overlay-btn" type="button">▶ JUGAR</button>
+      <div class="nexar-promo" id="nexar-promo" aria-live="polite">
+        <div class="nexar-promo-label" id="nexar-promo-label">Nexar Sistemas</div>
+        <div class="nexar-promo-copy" id="nexar-promo-copy">Software simple para organizar tu negocio.</div>
+        <a class="nexar-promo-link" id="nexar-promo-link" href="https://nexarsistemas.com.ar/" target="_blank" rel="noopener noreferrer">Conocer más →</a>
+      </div>
     </div>
   </div>
 
@@ -572,6 +620,11 @@
     const GLOWS = ['', 'rgba(0,245,255,.8)', 'rgba(255,0,110,.8)', 'rgba(255,238,0,.8)', 'rgba(57,255,20,.8)', 'rgba(255,140,0,.8)', 'rgba(191,0,255,.8)', 'rgba(255,69,0,.8)'];
     const SPEEDS = { easy: 720, medium: 500, hard: 320 };
     const DIFF_FACTOR = { easy: .93, medium: .87, hard: .8 };
+    const PROMOS = {
+      start: { label: 'Nexar Sistemas', copy: 'Software simple para organizar tu negocio.', href: 'https://nexarsistemas.com.ar/' },
+      pause: { label: 'Nexar Comercio', copy: 'Ventas, stock, caja y gestión comercial.', href: 'https://nexarsistemas.com.ar/' },
+      gameover: { label: 'Nexar Finanzas', copy: 'Organizá tus finanzas de forma simple.', href: 'https://nexarsistemas.com.ar/' }
+    };
     const THEMES = {
       cyberpunk: { bg: '#050510', panel: 'rgba(10, 10, 31, 0.92)', panelStrong: '#0a0a1f', border: '#1a1a4a', neonCyan: '#00f5ff', neonPink: '#ff006e', neonYellow: '#ffee00', neonGreen: '#39ff14', text: '#c0c0ff', dim: '#5757b8', canvasBg: '#020210' },
       retro: { bg: '#050805', panel: 'rgba(0, 20, 0, 0.92)', panelStrong: '#001300', border: '#0a4a0a', neonCyan: '#00ff66', neonPink: '#ff00ff', neonYellow: '#ffff00', neonGreen: '#00ff66', text: '#abffab', dim: '#3e9f3e', canvasBg: '#000800' },
@@ -607,6 +660,9 @@
       overlayMsg: document.getElementById('overlay-msg'),
       overlayScore: document.getElementById('overlay-score'),
       overlayBtn: document.getElementById('overlay-btn'),
+      promoLabel: document.getElementById('nexar-promo-label'),
+      promoCopy: document.getElementById('nexar-promo-copy'),
+      promoLink: document.getElementById('nexar-promo-link'),
       btnPause: document.getElementById('btn-pause'),
       btnSound: document.getElementById('btn-sound'),
       btnTimeAttack: document.getElementById('btn-timeattack')
@@ -649,6 +705,23 @@
     function readNumber(key, fallback) {
       const parsed = Number(localStorage.getItem(key));
       return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function setPromo(name) {
+      const promo = PROMOS[name] || PROMOS.start;
+      els.promoLabel.textContent = promo.label;
+      els.promoCopy.textContent = promo.copy;
+      els.promoLink.href = promo.href;
+      els.promoLink.setAttribute('aria-label', `Conocer más sobre ${promo.label}`);
+    }
+
+    function showPauseScreen() {
+      els.overlayMsg.textContent = 'PAUSA';
+      els.overlayScore.hidden = false;
+      els.overlayScore.textContent = `PUNTOS: ${score}`;
+      els.overlayBtn.textContent = '▶ CONTINUAR';
+      setPromo('pause');
+      els.overlay.classList.remove('hidden');
     }
 
     function shuffle(values) {
@@ -713,7 +786,13 @@
       if (!running || gameOver) return;
       paused = !paused;
       els.btnPause.textContent = paused ? '▶' : '⏸';
-      if (!paused) requestAnimationFrame(loop);
+      if (paused) {
+        saveGame();
+        showPauseScreen();
+      } else {
+        els.overlay.classList.add('hidden');
+        requestAnimationFrame(loop);
+      }
       draw();
     }
 
@@ -729,6 +808,7 @@
         els.overlayScore.hidden = false;
         els.overlayScore.textContent = `PUNTOS: ${score} · RÉCORD: ${hiScore}`;
         els.overlayBtn.textContent = '↺ REINICIAR';
+        setPromo('gameover');
         els.overlay.classList.remove('hidden');
       }, 280);
     }
@@ -1124,6 +1204,7 @@
         els.overlayScore.hidden = false;
         els.overlayScore.textContent = `PUNTOS: ${score}`;
         els.overlayBtn.textContent = '▶ CONTINUAR';
+        setPromo('start');
         updateDifficultyButtons();
         updateTimeAttackButton();
         updateDisplay();
@@ -1324,6 +1405,9 @@
           saveGame();
           paused = true;
           els.btnPause.textContent = '▶';
+        } else if (!document.hidden && running && paused && !gameOver) {
+          showPauseScreen();
+          draw();
         }
       });
       setInterval(saveGame, 20000);
@@ -1334,6 +1418,7 @@
       applyTheme(localStorage.getItem(THEME_KEY) || 'cyberpunk');
       updateDifficultyButtons();
       updateTimeAttackButton();
+      setPromo('start');
       els.hi.textContent = hiScore.toLocaleString('es-AR');
       resizeGame();
       if (!loadGame()) {
