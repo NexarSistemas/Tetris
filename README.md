@@ -1,30 +1,106 @@
-# Tetris App
+# Tetris Deluxe
 
-Una implementación clásica del juego Tetris desarrollada con un enfoque en código limpio y eficiencia.
+Juego clásico de Tetris desarrollado en HTML, CSS y JavaScript, optimizado para jugar directamente desde el navegador tanto en PC como en dispositivos móviles.
 
-## Versión Actual
-`0.1.1`
+Desarrollado por **Nexar Sistemas**.
+
+## Versión actual
+
+`0.2.0`
 
 ## Características
-- Mecánicas clásicas de rotación y movimiento de piezas.
+
+- Mecánicas clásicas de Tetris.
+- Movimiento y rotación de piezas.
+- Detección de colisiones.
+- Eliminación de líneas.
 - Sistema de puntuación.
-- Detección de colisiones y limpieza de líneas.
+- Sistema de niveles.
+- Registro de récord.
+- Sistema de combos.
+- Vista de la siguiente pieza.
+- Función **HOLD** para guardar una pieza.
+- Caída rápida.
+- Diferentes niveles de dificultad.
+- Diferentes temas visuales.
+- Modo normal y modo contrarreloj.
+- Pausa y reinicio de partida.
+- Efectos de sonido.
+- Controles mediante teclado.
+- Controles táctiles para dispositivos móviles.
+- Interfaz responsive adaptada a PC y celular.
+- Compatibilidad con áreas seguras de dispositivos móviles.
 
 ## Requisitos
-- Cualquier navegador es optimo para ejecutar Tetris.
 
-## Instalación
+No requiere instalación ni dependencias.
 
-1. Clona el repositorio:
-   ```bash
-   git clone https://github.com/usuario/Tetris.git
-   ```
-2. Navega al directorio del proyecto:
-   ```bash
-   cd Tetris
-   ```
+Solo es necesario un navegador web moderno.
 
-## Controles
-- **Flechas Izquierda/Derecha**: Mover pieza.
-- **Flecha Arriba**: Rotar pieza.
-- **Flecha Abajo**: Caída rápida.
+Compatible con:
+
+- Google Chrome
+- Microsoft Edge
+- Mozilla Firefox
+- Safari
+- Navegadores móviles modernos
+
+## Uso local
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/NexarSistemas/Tetris.git
+```
+
+Entrar al directorio:
+
+```bash
+cd Tetris
+```
+
+Abrir `index.html` en un navegador.
+
+También puede ejecutarse mediante un servidor HTTP local.
+
+Por ejemplo, con Python:
+
+```bash
+python -m http.server 8000
+```
+
+Luego abrir:
+
+```text
+http://localhost:8000
+```
+
+## Controles de teclado
+
+- **← / →**: mover pieza.
+- **↑**: rotar pieza.
+- **↓**: bajar pieza.
+- **Espacio**: caída rápida.
+- **H**: HOLD.
+- **P**: pausar o reanudar la partida.
+
+En dispositivos móviles pueden utilizarse los controles táctiles incluidos en la interfaz.
+
+## GitHub Pages
+
+El juego está preparado para publicarse directamente mediante GitHub Pages desde este repositorio, sin necesidad de servicios externos ni backend.
+
+## Tecnología
+
+- HTML5
+- CSS3
+- JavaScript
+- Canvas API
+
+## Licencia
+
+Consultar el archivo `LICENSE` del repositorio.
+
+---
+
+**Nexar Sistemas**
