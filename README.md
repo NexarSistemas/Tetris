@@ -1,8 +1,10 @@
 # Tetris Deluxe
 
-Juego clásico de Tetris desarrollado en HTML, CSS y JavaScript, optimizado para jugar directamente desde el navegador tanto en PC como en dispositivos móviles.
+Tetris Deluxe es una implementación independiente desarrollada por Nexar Sistemas en HTML, CSS y JavaScript, optimizada para jugar directamente desde el navegador tanto en PC como en dispositivos móviles.
 
 Desarrollado por **Nexar Sistemas**.
+
+Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. Tetris Deluxe no está afiliado, patrocinado ni es un producto oficial de dichos terceros.
 
 ## Versión actual
 
