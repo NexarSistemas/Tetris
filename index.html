@@ -345,9 +345,11 @@
     #btn-pause,
     #btn-reset,
     #btn-sound,
-    #btn-timeattack { background: #334155; color: white; }
+    #btn-timeattack,
+    #btn-ghost { background: #334155; color: white; }
     #btn-sound.active,
-    #btn-timeattack.active { background: var(--neon-green); color: #052e16; }
+    #btn-timeattack.active,
+    #btn-ghost.active { background: var(--neon-green); color: #052e16; }
 
     .touch-controls {
       grid-column: 2;
@@ -734,6 +736,7 @@
             <button class="btn btn-action" id="btn-reset" type="button">↺</button>
             <button class="btn btn-action" id="btn-sound" type="button">🔇</button>
             <button class="btn btn-action" id="btn-timeattack" type="button">⏱</button>
+            <button class="btn btn-action active" id="btn-ghost" type="button" aria-pressed="true" aria-label="Ocultar sombra de caída" title="Ocultar sombra de caída">Sombra</button>
           </div>
         </div>
       </section>
@@ -770,6 +773,7 @@
     const HI_KEY = 'nexar_tetris_deluxe_hi_v3';
     const THEME_KEY = 'nexar_tetris_deluxe_theme_v3';
     const DIFFICULTY_KEY = 'nexar_tetris_deluxe_difficulty_v3';
+    const GHOST_KEY = 'nexar_tetris_deluxe_ghost_v1';
     const COLORS = ['', '#00f5ff', '#ff006e', '#ffee00', '#39ff14', '#ff8c00', '#bf00ff', '#ff4500'];
     const GLOWS = ['', 'rgba(0,245,255,.8)', 'rgba(255,0,110,.8)', 'rgba(255,238,0,.8)', 'rgba(57,255,20,.8)', 'rgba(255,140,0,.8)', 'rgba(191,0,255,.8)', 'rgba(255,69,0,.8)'];
     const SPEEDS = { easy: 720, medium: 500, hard: 320 };
@@ -828,7 +832,8 @@
       promoLink: document.getElementById('nexar-promo-link'),
       btnPause: document.getElementById('btn-pause'),
       btnSound: document.getElementById('btn-sound'),
-      btnTimeAttack: document.getElementById('btn-timeattack')
+      btnTimeAttack: document.getElementById('btn-timeattack'),
+      btnGhost: document.getElementById('btn-ghost')
     };
 
     let cell = 24;
@@ -847,6 +852,7 @@
     let paused = false;
     let gameOver = false;
     let difficulty = localStorage.getItem(DIFFICULTY_KEY) || 'easy';
+    let ghostEnabled = readGhostEnabled();
     let timeAttackMode = false;
     let timeLeft = 90;
     let soundEnabled = false;
@@ -868,6 +874,13 @@
     function readNumber(key, fallback) {
       const parsed = Number(localStorage.getItem(key));
       return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function readGhostEnabled() {
+      const stored = localStorage.getItem(GHOST_KEY);
+      if (stored === null || stored === 'true') return true;
+      if (stored === 'false') return false;
+      return true;
     }
 
     function setPromo(name) {
@@ -1195,7 +1208,7 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       drawGrid();
       drawBoard();
-      if (current && running) drawGhost();
+      if (current && running && ghostEnabled) drawGhost();
       if (current && running) drawMatrix(ctx, current.matrix, current.x, current.y, 1);
       drawParticles();
       if (paused) drawPauseOverlay();
@@ -1412,6 +1425,21 @@
       els.btnTimeAttack.classList.toggle('active', timeAttackMode);
     }
 
+    function updateGhostButton() {
+      els.btnGhost.classList.toggle('active', ghostEnabled);
+      els.btnGhost.setAttribute('aria-pressed', String(ghostEnabled));
+      const label = ghostEnabled ? 'Ocultar sombra de caída' : 'Mostrar sombra de caída';
+      els.btnGhost.setAttribute('aria-label', label);
+      els.btnGhost.title = label;
+    }
+
+    function toggleGhost() {
+      ghostEnabled = !ghostEnabled;
+      localStorage.setItem(GHOST_KEY, String(ghostEnabled));
+      updateGhostButton();
+      draw();
+    }
+
     function setDifficulty(value) {
       if (!SPEEDS[value]) return;
       difficulty = value;
@@ -1550,6 +1578,7 @@
       document.getElementById('btn-pause').addEventListener('click', togglePause);
       els.btnSound.addEventListener('click', toggleSound);
       els.btnTimeAttack.addEventListener('click', toggleTimeAttack);
+      els.btnGhost.addEventListener('click', toggleGhost);
       els.overlayBtn.addEventListener('click', continueLoadedGame);
 
       document.querySelectorAll('[data-difficulty]').forEach(btn => btn.addEventListener('click', () => setDifficulty(btn.dataset.difficulty)));
@@ -1596,6 +1625,7 @@
       applyTheme(localStorage.getItem(THEME_KEY) || 'cyberpunk');
       updateDifficultyButtons();
       updateTimeAttackButton();
+      updateGhostButton();
       setPromo('start');
       els.hi.textContent = hiScore.toLocaleString('es-AR');
       resizeGame();

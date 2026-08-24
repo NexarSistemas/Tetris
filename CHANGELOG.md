@@ -6,6 +6,17 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-24
+
+### Added
+
+- Opción para mostrar u ocultar la sombra de caída desde la sección `Juego`.
+
+### Changed
+
+- La preferencia de la sombra de caída se guarda localmente en forma independiente de la partida.
+- La sombra de caída permanece activada por defecto cuando no existe preferencia previa o el valor guardado es inválido.
+
 ## [0.2.2] - 2026-08-24
 
 ### Changed
