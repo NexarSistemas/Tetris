@@ -34,6 +34,11 @@
       --accent-deep: #2563eb;
       --line: #314158;
       --line-strong: #8ca0b8;
+      --body-glow: rgba(56, 189, 248, 0.15);
+      --body-glow-2: rgba(37, 99, 235, 0.12);
+      --overlay-bg: rgba(7, 17, 31, .88);
+      --overlay-card-bg: rgba(15, 28, 46, 0.98);
+      --toast-bg: rgba(15, 28, 46, .96);
       --shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -50,7 +55,7 @@
     body {
       width: 100%;
       min-height: 100%;
-      background: #07111f;
+      background: var(--bg);
       color: var(--app-text);
       font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
       overscroll-behavior: none;
@@ -61,9 +66,9 @@
       overflow-x: hidden;
       padding: 22px 14px;
       background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.15), transparent 34rem),
-        radial-gradient(circle at 85% 15%, rgba(37, 99, 235, 0.12), transparent 28rem),
-        #07111f;
+        radial-gradient(circle at top left, var(--body-glow), transparent 34rem),
+        radial-gradient(circle at 85% 15%, var(--body-glow-2), transparent 28rem),
+        var(--bg);
     }
 
     button {
@@ -419,7 +424,7 @@
       position: fixed;
       inset: 0;
       z-index: 30;
-      background: rgba(7, 17, 31, .88);
+      background: var(--overlay-bg);
       backdrop-filter: blur(10px);
       display: grid;
       place-items: center;
@@ -432,7 +437,7 @@
       width: min(94vw, 430px);
       border: 1px solid rgba(148, 163, 184, 0.16);
       border-radius: 22px;
-      background: rgba(15, 28, 46, 0.98);
+      background: var(--overlay-card-bg);
       box-shadow: var(--shadow);
       padding: 28px;
       text-align: center;
@@ -523,7 +528,7 @@
       padding: 10px 14px;
       border-left: 4px solid var(--accent);
       border-radius: 12px;
-      background: rgba(15, 28, 46, .96);
+      background: var(--toast-bg);
       color: var(--app-text);
       font-size: .82rem;
       font-weight: 800;
@@ -742,9 +747,18 @@
       gameover: { label: 'Nexar Finanzas', copy: 'Organizá tus finanzas de forma simple.', href: 'https://nexarsistemas.com.ar/' }
     };
     const THEMES = {
-      cyberpunk: { bg: '#050510', panel: 'rgba(10, 10, 31, 0.92)', panelStrong: '#0a0a1f', border: '#1a1a4a', neonCyan: '#00f5ff', neonPink: '#ff006e', neonYellow: '#ffee00', neonGreen: '#39ff14', text: '#c0c0ff', dim: '#5757b8', canvasBg: '#020210' },
-      retro: { bg: '#050805', panel: 'rgba(0, 20, 0, 0.92)', panelStrong: '#001300', border: '#0a4a0a', neonCyan: '#00ff66', neonPink: '#ff00ff', neonYellow: '#ffff00', neonGreen: '#00ff66', text: '#abffab', dim: '#3e9f3e', canvasBg: '#000800' },
-      ocean: { bg: '#001133', panel: 'rgba(0, 22, 54, 0.92)', panelStrong: '#001633', border: '#114b7a', neonCyan: '#00ccff', neonPink: '#ff66cc', neonYellow: '#ffcc00', neonGreen: '#33ff99', text: '#aaddff', dim: '#5b93c4', canvasBg: '#000b1f' }
+      cyberpunk: {
+        bg: '#07111f', panel: 'rgba(15, 28, 46, 0.96)', panelStrong: '#17263a', border: 'rgba(148, 163, 184, 0.18)', neonCyan: '#38bdf8', neonPink: '#f472b6', neonYellow: '#f59e0b', neonGreen: '#22c55e', text: '#f7f9fc', dim: '#9eacc0', canvasBg: '#08111f',
+        surface: '#0f1c2e', surface2: '#17263a', surface3: '#223249', appText: '#f7f9fc', appMuted: '#9eacc0', accent: '#38bdf8', accentStrong: '#0ea5e9', accentDeep: '#2563eb', line: '#314158', lineStrong: '#8ca0b8', bodyGlow: 'rgba(56, 189, 248, 0.15)', bodyGlow2: 'rgba(37, 99, 235, 0.12)', overlayBg: 'rgba(7, 17, 31, .88)', overlayCardBg: 'rgba(15, 28, 46, 0.98)', toastBg: 'rgba(15, 28, 46, .96)'
+      },
+      retro: {
+        bg: '#07170d', panel: 'rgba(14, 36, 22, 0.96)', panelStrong: '#153320', border: 'rgba(134, 239, 172, 0.18)', neonCyan: '#4ade80', neonPink: '#f9a8d4', neonYellow: '#facc15', neonGreen: '#22c55e', text: '#f0fdf4', dim: '#a7c9ae', canvasBg: '#051107',
+        surface: '#0e2416', surface2: '#153320', surface3: '#21462d', appText: '#f0fdf4', appMuted: '#a7c9ae', accent: '#4ade80', accentStrong: '#16a34a', accentDeep: '#15803d', line: '#315b3b', lineStrong: '#86efac', bodyGlow: 'rgba(34, 197, 94, 0.14)', bodyGlow2: 'rgba(250, 204, 21, 0.09)', overlayBg: 'rgba(7, 23, 13, .88)', overlayCardBg: 'rgba(14, 36, 22, 0.98)', toastBg: 'rgba(14, 36, 22, .96)'
+      },
+      ocean: {
+        bg: '#06152c', panel: 'rgba(10, 32, 63, 0.96)', panelStrong: '#10294d', border: 'rgba(125, 211, 252, 0.18)', neonCyan: '#22d3ee', neonPink: '#93c5fd', neonYellow: '#fbbf24', neonGreen: '#5eead4', text: '#eff6ff', dim: '#a7bdd8', canvasBg: '#031024',
+        surface: '#0a203f', surface2: '#10294d', surface3: '#1c3d68', appText: '#eff6ff', appMuted: '#a7bdd8', accent: '#22d3ee', accentStrong: '#0284c7', accentDeep: '#1d4ed8', line: '#31577e', lineStrong: '#7dd3fc', bodyGlow: 'rgba(34, 211, 238, 0.15)', bodyGlow2: 'rgba(29, 78, 216, 0.13)', overlayBg: 'rgba(6, 21, 44, .88)', overlayCardBg: 'rgba(10, 32, 63, 0.98)', toastBg: 'rgba(10, 32, 63, .96)'
+      }
     };
 
     const SHAPES = {
@@ -1390,6 +1404,21 @@
       root.style.setProperty('--text', theme.text);
       root.style.setProperty('--dim', theme.dim);
       root.style.setProperty('--canvas-bg', theme.canvasBg);
+      root.style.setProperty('--surface', theme.surface);
+      root.style.setProperty('--surface-2', theme.surface2);
+      root.style.setProperty('--surface-3', theme.surface3);
+      root.style.setProperty('--app-text', theme.appText);
+      root.style.setProperty('--app-muted', theme.appMuted);
+      root.style.setProperty('--accent', theme.accent);
+      root.style.setProperty('--accent-strong', theme.accentStrong);
+      root.style.setProperty('--accent-deep', theme.accentDeep);
+      root.style.setProperty('--line', theme.line);
+      root.style.setProperty('--line-strong', theme.lineStrong);
+      root.style.setProperty('--body-glow', theme.bodyGlow);
+      root.style.setProperty('--body-glow-2', theme.bodyGlow2);
+      root.style.setProperty('--overlay-bg', theme.overlayBg);
+      root.style.setProperty('--overlay-card-bg', theme.overlayCardBg);
+      root.style.setProperty('--toast-bg', theme.toastBg);
       localStorage.setItem(THEME_KEY, name);
       document.querySelectorAll('[data-theme]').forEach(btn => btn.classList.toggle('selected', btn.dataset.theme === name));
       draw();
