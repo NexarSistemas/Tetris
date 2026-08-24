@@ -6,6 +6,8 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-23
+
 ### Added
 
 - Promociones internas y discretas de productos Nexar en estados no activos del juego.
@@ -16,6 +18,8 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Adaptación visual de Tetris a la identidad Nexar Play.
+- Actualización de la interfaz principal, controles, temas y footer sin modificar la lógica del juego.
 - La pausa reutiliza ahora el overlay principal para mantener una experiencia visual consistente.
 - Las promociones permanecen fuera de la partida activa para no interferir con la jugabilidad.
 
