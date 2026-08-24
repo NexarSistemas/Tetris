@@ -8,7 +8,7 @@ Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. 
 
 ## Versión actual
 
-`0.2.2`
+`0.3.0`
 
 ## Características
 
@@ -22,6 +22,7 @@ Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. 
 - Sistema de combos.
 - Vista de la siguiente pieza.
 - Función **HOLD** para guardar una pieza.
+- Sombra de caída configurable, activada por defecto y persistida localmente.
 - Caída rápida.
 - Diferentes niveles de dificultad.
 - Diferentes temas visuales.
