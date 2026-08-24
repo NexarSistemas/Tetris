@@ -6,6 +6,14 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-08-24
+
+### Changed
+
+- Mejora del layout responsive para mantener el juego completo en escritorio cuando hay espacio suficiente.
+- Fallback con scroll vertical seguro en pantallas de poca altura para evitar contenido o controles cortados.
+- Mejor compatibilidad con tablets y anchos intermedios, sin cambios en la lógica ni funcionalidades del juego.
+
 ## [0.2.1] - 2026-08-23
 
 ### Added

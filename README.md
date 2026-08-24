@@ -8,7 +8,7 @@ Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. 
 
 ## Versión actual
 
-`0.2.1`
+`0.2.2`
 
 ## Características
 
