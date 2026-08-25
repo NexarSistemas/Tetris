@@ -6,6 +6,18 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-24
+
+### Added
+
+- Música de fondo 8-bit original generada con Web Audio API durante la partida activa, sin dependencias ni archivos externos.
+- Botón independiente de Música en la sección `Juego`, con persistencia local de la preferencia.
+
+### Changed
+
+- La música se pausa al pausar la partida, al ocultar la pestaña y en game over, y se reanuda al continuar si sigue habilitada.
+- La configuración musical permanece fuera del guardado de partida y es independiente de los efectos de sonido.
+
 ## [0.3.0] - 2026-08-24
 
 ### Added
