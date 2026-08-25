@@ -6,6 +6,12 @@ El proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-25
+
+### Fixed
+
+- Se corrige la liberación de nodos de audio de la música para evitar crecimiento del grafo durante sesiones largas.
+
 ## [0.4.0] - 2026-08-24
 
 ### Added
