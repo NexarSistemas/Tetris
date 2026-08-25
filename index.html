@@ -914,7 +914,7 @@
     let musicCursor = 0;
     let musicNoteIndex = 0;
     let musicGeneration = 0;
-    const musicNodes = new Set();
+    const musicVoices = new Set();
     let dropAccumulator = 0;
     let lastFrame = 0;
     let particles = [];
@@ -1591,13 +1591,18 @@
       return musicEnabled && running && !paused && !gameOver;
     }
 
-    function releaseMusicNode(node) {
-      if (!node) return;
-      musicNodes.delete(node);
+    function releaseMusicVoice(voice) {
+      if (!voice || !musicVoices.has(voice)) return;
+      musicVoices.delete(voice);
       try {
-        node.disconnect();
+        voice.osc.disconnect();
       } catch (error) {
-        console.warn('No se pudo desconectar un nodo de música', error);
+        console.warn('No se pudo desconectar un oscilador de música', error);
+      }
+      try {
+        voice.gain.disconnect();
+      } catch (error) {
+        console.warn('No se pudo desconectar un gain de música', error);
       }
     }
 
@@ -1609,13 +1614,13 @@
       musicNoteIndex = 0;
       clearTimeout(musicTimer);
       musicTimer = null;
-      musicNodes.forEach(node => {
+      musicVoices.forEach(voice => {
         try {
-          node.stop();
+          voice.osc.stop();
         } catch (error) {
           console.warn('No se pudo detener un oscilador de música', error);
         }
-        releaseMusicNode(node);
+        releaseMusicVoice(voice);
       });
     }
 
@@ -1631,10 +1636,11 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      musicNodes.add(osc);
+      const voice = { osc, gain };
+      musicVoices.add(voice);
       osc.onended = () => {
-        if (generation === musicGeneration) releaseMusicNode(osc);
-        else musicNodes.delete(osc);
+        if (generation === musicGeneration) releaseMusicVoice(voice);
+        else musicVoices.delete(voice);
       };
       osc.start(startTime);
       osc.stop(startTime + duration + 0.02);
