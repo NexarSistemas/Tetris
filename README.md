@@ -8,7 +8,7 @@ Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. 
 
 ## Versión actual
 
-`0.3.0`
+`0.4.0`
 
 ## Características
 
@@ -29,6 +29,8 @@ Las marcas o denominaciones de terceros pertenecen a sus respectivos titulares. 
 - Modo normal y modo contrarreloj.
 - Pausa y reinicio de partida.
 - Efectos de sonido.
+- Música de fondo 8-bit original generada con Web Audio API, sin archivos externos.
+- Activación independiente para música y efectos, con preferencia musical guardada localmente.
 - Controles mediante teclado.
 - Controles táctiles para dispositivos móviles.
 - Interfaz responsive adaptada a PC y celular.

@@ -345,9 +345,11 @@
     #btn-pause,
     #btn-reset,
     #btn-sound,
+    #btn-music,
     #btn-timeattack,
     #btn-ghost { background: #334155; color: white; }
     #btn-sound.active,
+    #btn-music.active,
     #btn-timeattack.active,
     #btn-ghost.active { background: var(--neon-green); color: #052e16; }
 
@@ -735,6 +737,7 @@
             <button class="btn btn-action" id="btn-pause" type="button">⏸</button>
             <button class="btn btn-action" id="btn-reset" type="button">↺</button>
             <button class="btn btn-action" id="btn-sound" type="button">🔇</button>
+            <button class="btn btn-action" id="btn-music" type="button" aria-pressed="false" aria-label="Activar música de fondo" title="Activar música de fondo">🎵</button>
             <button class="btn btn-action" id="btn-timeattack" type="button">⏱</button>
             <button class="btn btn-action active" id="btn-ghost" type="button" aria-pressed="true" aria-label="Ocultar sombra de caída" title="Ocultar sombra de caída">Sombra</button>
           </div>
@@ -774,10 +777,56 @@
     const THEME_KEY = 'nexar_tetris_deluxe_theme_v3';
     const DIFFICULTY_KEY = 'nexar_tetris_deluxe_difficulty_v3';
     const GHOST_KEY = 'nexar_tetris_deluxe_ghost_v1';
+    const MUSIC_KEY = 'nexar_tetris_deluxe_music_v1';
     const COLORS = ['', '#00f5ff', '#ff006e', '#ffee00', '#39ff14', '#ff8c00', '#bf00ff', '#ff4500'];
     const GLOWS = ['', 'rgba(0,245,255,.8)', 'rgba(255,0,110,.8)', 'rgba(255,238,0,.8)', 'rgba(57,255,20,.8)', 'rgba(255,140,0,.8)', 'rgba(191,0,255,.8)', 'rgba(255,69,0,.8)'];
     const SPEEDS = { easy: 720, medium: 500, hard: 320 };
     const DIFF_FACTOR = { easy: .93, medium: .87, hard: .8 };
+    const MUSIC_LOOKAHEAD_MS = 180;
+    const MUSIC_SCHEDULE_AHEAD = 0.7;
+    const MUSIC_STEP_SECONDS = 0.3;
+    const MUSIC_PATTERN = [
+      { freq: 220.0, len: 1, accent: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 349.23, len: 2, accent: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 246.94, len: 1 },
+      { freq: 220.0, len: 2, accent: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 392.0, len: 2, accent: 1 },
+      { freq: 349.23, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 293.66, len: 2 },
+      { freq: 246.94, len: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 369.99, len: 1 },
+      { freq: 440.0, len: 2, accent: 1 },
+      { freq: 392.0, len: 1 },
+      { freq: 349.23, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 293.66, len: 2, accent: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 329.63, len: 1 },
+      { freq: 349.23, len: 1 },
+      { freq: 293.66, len: 2 },
+      { freq: 261.63, len: 1 },
+      { freq: 246.94, len: 1 },
+      { freq: 220.0, len: 2, accent: 1 },
+      { freq: 246.94, len: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 293.66, len: 1 },
+      { freq: 261.63, len: 1 },
+      { freq: 246.94, len: 2 },
+      { freq: 220.0, len: 4, accent: 1 }
+    ];
+    const MUSIC_LOOP_SECONDS = MUSIC_PATTERN.reduce((total, note) => total + note.len, 0) * MUSIC_STEP_SECONDS;
     const PROMOS = {
       start: { label: 'Nexar Sistemas', copy: 'Software simple para organizar tu negocio.', href: 'https://nexarsistemas.com.ar/' },
       pause: { label: 'Nexar Comercio', copy: 'Ventas, stock, caja y gestión comercial.', href: 'https://nexarsistemas.com.ar/' },
@@ -832,6 +881,7 @@
       promoLink: document.getElementById('nexar-promo-link'),
       btnPause: document.getElementById('btn-pause'),
       btnSound: document.getElementById('btn-sound'),
+      btnMusic: document.getElementById('btn-music'),
       btnTimeAttack: document.getElementById('btn-timeattack'),
       btnGhost: document.getElementById('btn-ghost')
     };
@@ -853,10 +903,18 @@
     let gameOver = false;
     let difficulty = localStorage.getItem(DIFFICULTY_KEY) || 'easy';
     let ghostEnabled = readGhostEnabled();
+    let musicEnabled = readMusicEnabled();
     let timeAttackMode = false;
     let timeLeft = 90;
     let soundEnabled = false;
     let audioCtx = null;
+    let musicTimer = null;
+    let musicPlaying = false;
+    let musicStartTime = 0;
+    let musicCursor = 0;
+    let musicNoteIndex = 0;
+    let musicGeneration = 0;
+    const musicNodes = new Set();
     let dropAccumulator = 0;
     let lastFrame = 0;
     let particles = [];
@@ -881,6 +939,10 @@
       if (stored === null || stored === 'true') return true;
       if (stored === 'false') return false;
       return true;
+    }
+
+    function readMusicEnabled() {
+      return localStorage.getItem(MUSIC_KEY) === 'true';
     }
 
     function setPromo(name) {
@@ -935,6 +997,7 @@
 
     function startGame() {
       initAudio();
+      stopMusic();
       board = createBoard();
       current = null;
       next = nextPieceFromBag();
@@ -955,6 +1018,7 @@
       spawnPiece();
       updateDisplay();
       saveGame();
+      syncMusicPlayback();
       requestAnimationFrame(loop);
     }
 
@@ -963,10 +1027,12 @@
       paused = !paused;
       els.btnPause.textContent = paused ? '▶' : '⏸';
       if (paused) {
+        stopMusic();
         saveGame();
         showPauseScreen();
       } else {
         els.overlay.classList.add('hidden');
+        syncMusicPlayback();
         requestAnimationFrame(loop);
       }
       draw();
@@ -977,6 +1043,7 @@
       running = false;
       paused = false;
       gameOver = true;
+      stopMusic();
       playSequence([300, 245, 190, 135], 'sawtooth', .16, .12);
       localStorage.removeItem(SAVE_KEY);
       setTimeout(() => {
@@ -1402,6 +1469,7 @@
       paused = false;
       els.btnPause.textContent = '⏸';
       els.overlay.classList.add('hidden');
+      syncMusicPlayback();
       requestAnimationFrame(loop);
     }
 
@@ -1488,7 +1556,7 @@
     }
 
     function initAudio() {
-      if (!soundEnabled) return;
+      if (!soundEnabled && !musicEnabled) return;
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
@@ -1509,6 +1577,116 @@
 
     function playSequence(freqs, type, duration, volume) {
       freqs.forEach((freq, index) => setTimeout(() => playTone(freq, type, duration, volume), index * 70));
+    }
+
+    function updateMusicButton() {
+      els.btnMusic.classList.toggle('active', musicEnabled);
+      els.btnMusic.setAttribute('aria-pressed', String(musicEnabled));
+      const label = musicEnabled ? 'Desactivar música de fondo' : 'Activar música de fondo';
+      els.btnMusic.setAttribute('aria-label', label);
+      els.btnMusic.title = label;
+    }
+
+    function canPlayMusic() {
+      return musicEnabled && running && !paused && !gameOver;
+    }
+
+    function releaseMusicNode(node) {
+      if (!node) return;
+      musicNodes.delete(node);
+      try {
+        node.disconnect();
+      } catch (error) {
+        console.warn('No se pudo desconectar un nodo de música', error);
+      }
+    }
+
+    function stopMusic() {
+      musicPlaying = false;
+      musicGeneration++;
+      musicCursor = 0;
+      musicStartTime = 0;
+      musicNoteIndex = 0;
+      clearTimeout(musicTimer);
+      musicTimer = null;
+      musicNodes.forEach(node => {
+        try {
+          node.stop();
+        } catch (error) {
+          console.warn('No se pudo detener un oscilador de música', error);
+        }
+        releaseMusicNode(node);
+      });
+    }
+
+    function scheduleMusicVoice(freq, startTime, duration, volume, generation) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(volume, startTime + 0.012);
+      gain.gain.exponentialRampToValueAtTime(Math.max(volume * 0.55, 0.0001), startTime + duration * 0.38);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      musicNodes.add(osc);
+      osc.onended = () => {
+        if (generation === musicGeneration) releaseMusicNode(osc);
+        else musicNodes.delete(osc);
+      };
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.02);
+    }
+
+    function scheduleMusicLoop() {
+      if (!musicPlaying || !audioCtx) return;
+      const generation = musicGeneration;
+      while (musicStartTime + musicCursor < audioCtx.currentTime + MUSIC_SCHEDULE_AHEAD) {
+        const note = MUSIC_PATTERN[musicNoteIndex];
+        const noteStart = musicStartTime + musicCursor;
+        const noteLength = Math.max(MUSIC_STEP_SECONDS * note.len, 0.12);
+        const accentBoost = note.accent ? 0.006 : 0;
+        scheduleMusicVoice(note.freq, noteStart, noteLength * 0.92, 0.028 + accentBoost, generation);
+        musicCursor += MUSIC_STEP_SECONDS * note.len;
+        musicNoteIndex = (musicNoteIndex + 1) % MUSIC_PATTERN.length;
+        if (musicCursor >= MUSIC_LOOP_SECONDS) {
+          musicStartTime += MUSIC_LOOP_SECONDS;
+          musicCursor -= MUSIC_LOOP_SECONDS;
+        }
+      }
+      musicTimer = window.setTimeout(() => {
+        if (generation !== musicGeneration) return;
+        scheduleMusicLoop();
+      }, MUSIC_LOOKAHEAD_MS);
+    }
+
+    function startMusic() {
+      if (musicPlaying || !canPlayMusic()) return;
+      initAudio();
+      if (!audioCtx) return;
+      musicPlaying = true;
+      musicGeneration++;
+      musicCursor = 0;
+      musicNoteIndex = 0;
+      musicStartTime = audioCtx.currentTime + 0.04;
+      scheduleMusicLoop();
+    }
+
+    function syncMusicPlayback() {
+      if (canPlayMusic()) startMusic();
+      else stopMusic();
+    }
+
+    function toggleMusic() {
+      musicEnabled = !musicEnabled;
+      localStorage.setItem(MUSIC_KEY, String(musicEnabled));
+      updateMusicButton();
+      if (musicEnabled) {
+        initAudio();
+      }
+      syncMusicPlayback();
     }
 
     function toggleSound() {
@@ -1577,6 +1755,7 @@
       document.getElementById('btn-reset').addEventListener('click', resetGame);
       document.getElementById('btn-pause').addEventListener('click', togglePause);
       els.btnSound.addEventListener('click', toggleSound);
+      els.btnMusic.addEventListener('click', toggleMusic);
       els.btnTimeAttack.addEventListener('click', toggleTimeAttack);
       els.btnGhost.addEventListener('click', toggleGhost);
       els.overlayBtn.addEventListener('click', continueLoadedGame);
@@ -1609,6 +1788,7 @@
       window.addEventListener('orientationchange', () => setTimeout(resizeGame, 180));
       document.addEventListener('visibilitychange', () => {
         if (document.hidden && running && !gameOver) {
+          stopMusic();
           saveGame();
           paused = true;
           els.btnPause.textContent = '▶';
@@ -1626,6 +1806,7 @@
       updateDifficultyButtons();
       updateTimeAttackButton();
       updateGhostButton();
+      updateMusicButton();
       setPromo('start');
       els.hi.textContent = hiScore.toLocaleString('es-AR');
       resizeGame();
